@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Refund Concierge — Platform-Play Scorecard</title>
+<style>
+  :root{
+    --bg:#0a1424; --panel:#13294a; --ink:#eaf1ff; --mute:#9fb1d4;
+    --grid:#1e3358; --blue:#3b7bff; --green:#23c08a; --amber:#f0a830;
+    --purple:#a571f0; --hero:#1c3b73;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--bg);
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--ink);
+    -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1500px;margin:0 auto;padding:40px 44px 32px;}
+  h1{font-size:34px;margin:0 0 4px;font-weight:800;letter-spacing:-0.4px;}
+  .sub{font-size:18px;color:var(--mute);margin:0 0 22px;}
+  .sub b{color:var(--ink);}
+  table{width:100%;border-collapse:collapse;font-size:16px;}
+  thead th{background:var(--panel);color:var(--ink);text-align:left;
+    padding:13px 14px;font-size:14px;letter-spacing:.4px;text-transform:uppercase;
+    border-bottom:2px solid var(--blue);}
+  tbody td{padding:11px 14px;border-bottom:1px solid var(--grid);vertical-align:middle;}
+  tbody tr:nth-child(even){background:rgba(255,255,255,0.02);}
+  .hero{background:var(--hero)!important;}
+  .hero td{border-bottom:1px solid #2f5da3;}
+  .name{font-weight:700;white-space:nowrap;}
+  .verb{color:var(--ink);}
+  .verb b{color:var(--green);}
+  .star{color:var(--amber);font-size:17px;}
+  .heroTag{display:inline-block;background:var(--amber);color:#1a1300;
+    font-size:11px;font-weight:800;padding:2px 7px;border-radius:5px;
+    margin-left:6px;vertical-align:middle;letter-spacing:.4px;}
+  .diff{font-size:18px;text-align:center;}
+  .num{color:var(--mute);text-align:center;width:38px;font-weight:700;}
+  .vert{color:var(--mute);white-space:nowrap;}
+  .legend{margin-top:20px;display:flex;gap:34px;flex-wrap:wrap;
+    font-size:15px;color:var(--mute);align-items:center;}
+  .legend b{color:var(--ink);}
+  .key{display:inline-flex;align-items:center;gap:8px;}
+  .pill{display:inline-block;width:14px;height:14px;border-radius:50%;}
+  .footnote{margin-top:14px;font-size:13.5px;color:var(--mute);font-style:italic;
+    border-top:1px solid var(--grid);padding-top:12px;}
+  .footnote b{color:var(--green);font-style:normal;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>One primitive, a whole product line</h1>
+  <p class="sub">Every row = <b>conversation + Stripe + confirmation + memory</b>.
+     The agentic <b>action</b> is the bold verb.
+     <span class="star">★</span> = mapped to a <b>published BimpeAI recipe</b> &nbsp;=&nbsp; verifiably generalizes.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="num">#</th>
+        <th>Use case</th>
+        <th>The agentic action it takes</th>
+        <th>Channel</th>
+        <th>Vertical</th>
+        <th style="text-align:center">Build</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="hero">
+        <td class="num">1</td>
+        <td class="name"><span class="star">★</span> Refund Concierge<span class="heroTag">HERO · LIVE DEMO</span></td>
+        <td class="verb">Look up order → <b>issue Stripe refund</b> → confirm email + WhatsApp</td>
+        <td>Web Voice + chat</td>
+        <td class="vert">Retail / DTC</td>
+        <td class="diff">🟢</td>
+      </tr>
+      <tr>
+        <td class="num">2</td>
+        <td class="name"><span class="star">★</span> Order-Issue Resolver</td>
+        <td class="verb">Diagnose → <b>partial refund OR replacement</b> via REST</td>
+        <td>Chat + WhatsApp</td>
+        <td class="vert">Retail</td>
+        <td class="diff">🟢</td>
+      </tr>
+      <tr>
+        <td class="num">3</td>
+        <td class="name"><span class="star">★</span> Subscription Saver</td>
+        <td class="verb"><b>Pause / downgrade / cancel</b> the Stripe subscription + confirm</td>
+        <td>Chat + voice</td>
+        <td class="vert">Subscriptions</td>
+        <td class="diff">🟢</td>
+      </tr>
+      <tr>
+        <td class="num">4</td>
+        <td class="name"><span class="star">★</span> Pay-to-Book Agent</td>
+        <td class="verb">Check calendar → <b>take Stripe deposit</b> → book slot → confirm</td>
+        <td>Voice + chat</td>
+        <td class="vert">Services</td>
+        <td class="diff">🟢</td>
+      </tr>
+      <tr>
+        <td class="num">5</td>
+        <td class="name"><span class="star">★</span> Table + Deposit Agent</td>
+        <td class="verb">Book table → <b>charge deposit</b> → WhatsApp confirm + reminder</td>
+        <td>Voice + WhatsApp</td>
+        <td class="vert">Hospitality</td>
+        <td class="diff">🟡</td>
+      </tr>
+      <tr>
+        <td class="num">6</td>
+        <td class="name"><span class="star">★</span> Invoice Reminder Agent</td>
+        <td class="verb">Detect overdue → <b>send pay link, take Stripe payment</b> in-thread</td>
+        <td>WhatsApp + chat</td>
+        <td class="vert">Finance-lite</td>
+        <td class="diff">🟢</td>
+      </tr>
+      <tr>
+        <td class="num">7</td>
+        <td class="name"><span class="star">★</span> Transaction Verification</td>
+        <td class="verb">On flagged charge, <b>confirm or reverse</b> via REST → notify</td>
+        <td>WhatsApp + voice</td>
+        <td class="vert">Finance-lite</td>
+        <td class="diff">🟡</td>
+      </tr>
+      <tr>
+        <td class="num">8</td>
+        <td class="name"><span class="star">★</span> Lost / Stolen Card</td>
+        <td class="verb">Verify identity → <b>freeze card via REST</b> → confirm + reissue</td>
+        <td>Voice + chat</td>
+        <td class="vert">Finance-lite</td>
+        <td class="diff">🟡</td>
+      </tr>
+      <tr>
+        <td class="num">9</td>
+        <td class="name"><span class="star">★</span> Flash-Sale Concierge</td>
+        <td class="verb">Notify → take order → <b>charge via Stripe</b> before stock goes</td>
+        <td>WhatsApp + chat</td>
+        <td class="vert">Retail</td>
+        <td class="diff">🟢</td>
+      </tr>
+      <tr>
+        <td class="num">10</td>
+        <td class="name"><span class="star">★</span> Hotel Reservation</td>
+        <td class="verb">Book room → <b>take payment</b> → upsell → confirm email + WhatsApp</td>
+        <td>Voice + WhatsApp</td>
+        <td class="vert">Hospitality</td>
+        <td class="diff">🟡</td>
+      </tr>
+      <tr>
+        <td class="num">11</td>
+        <td class="name"><span class="star">★</span> Class Booking + Ticketing</td>
+        <td class="verb">Book class → <b>charge ticket</b> → manage waitlist → confirm</td>
+        <td>Chat + WhatsApp</td>
+        <td class="vert">Services</td>
+        <td class="diff">🟢</td>
+      </tr>
+      <tr>
+        <td class="num">12</td>
+        <td class="name">Warranty / Goodwill Credit</td>
+        <td class="verb">Validate claim window → <b>issue store credit or partial refund</b></td>
+        <td>Chat + voice</td>
+        <td class="vert">Retail</td>
+        <td class="diff">🟡</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="legend">
+    <span class="key"><span class="star" style="font-size:19px">★</span> <b>Published BimpeAI recipe</b> — verifiably generalizes (11 of 12)</span>
+    <span class="key"><span class="pill" style="background:var(--green)"></span> 🟢 Deployable tomorrow on documented primitives</span>
+    <span class="key"><span class="pill" style="background:var(--amber)"></span> 🟡 Needs one REST / calendar integration — still in-envelope</span>
+  </div>
+  <p class="footnote">
+    <b>One product line, six markets:</b> retail · subscriptions · services · hospitality · finance-lite · ops.
+    No 🔴 on purpose — every card is buildable on the exact primitives the hero demo already wires up. Scope flagged honestly, not over-promised.
+  </p>
+</div>
+</body>
+</html>

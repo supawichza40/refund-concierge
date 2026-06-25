@@ -1,0 +1,54 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "fontFamily": "Inter, Helvetica, Arial, sans-serif",
+    "fontSize": "18px",
+    "primaryColor": "#10243e",
+    "primaryTextColor": "#e8eef7",
+    "primaryBorderColor": "#2f6df0",
+    "lineColor": "#7c8db5",
+    "clusterBkg": "#0c1830",
+    "clusterBorder": "#2a3a5c"
+  },
+  "flowchart": { "curve": "basis", "nodeSpacing": 55, "rankSpacing": 70 }
+}}%%
+flowchart TB
+    subgraph Browser["BROWSER &nbsp;&middot;&nbsp; NO SECRETS"]
+        DASH["<b>Demo Dashboard</b><br/>Talk panel &middot; Reasoning trail<br/>Status board &middot; Wow-metric timer"]
+        VOICE["<b>BimpeAI Web Voice widget</b><br/>embedded SDK / iframe"]
+    end
+
+    subgraph Server["BACKEND BFF &nbsp;&middot;&nbsp; Next.js / Node &nbsp;&#128274; holds BIMPEAI_API_KEY"]
+        BFF["<b>API Routes /api/*</b>"]
+        ORCH["<b>Confirmation Orchestrator</b><br/>in-process &middot; parallel fan-out"]
+        BUS["<b>Event Bus + SSE hub</b><br/>in-memory"]
+        STATE["<b>Demo State Store</b><br/>in-memory + seed.json"]
+    end
+
+    subgraph External["EXTERNAL SERVICES"]
+        BIMP["<b>BimpeAI API</b><br/>agent &middot; refund tool &middot; WhatsApp"]
+        STRIPE["<b>Stripe TEST mode</b><br/>refund object"]
+        GMAIL["<b>Gmail</b> (Claude Gmail MCP)<br/>real email send"]
+        WA["<b>WhatsApp</b> via BimpeAI<br/>phone-number-based"]
+    end
+
+    DASH <==>|"SSE /api/events"| BUS
+    DASH -->|"POST /api/session/start"| BFF
+    VOICE <==>|"voice stream &middot; session token"| BIMP
+    BFF ==>|"server-side, KEY attached"| BIMP
+    BIMP -.->|"webhook POST /api/bimpe/webhook<br/>refund.issued &middot; tool.called"| BFF
+    BIMP --> STRIPE
+    BFF --> ORCH
+    ORCH ==>|"send email"| GMAIL
+    ORCH ==>|"send WhatsApp"| BIMP
+    BIMP --> WA
+    ORCH --> BUS
+    BFF --> BUS
+    STATE -.seed.-> ORCH
+
+    classDef browser fill:#13294a,stroke:#3b7bff,stroke-width:2px,color:#eaf1ff;
+    classDef server fill:#102a22,stroke:#23c08a,stroke-width:2px,color:#e6fff5;
+    classDef ext fill:#241a33,stroke:#a571f0,stroke-width:2px,color:#f1e9ff;
+    class DASH,VOICE browser;
+    class BFF,ORCH,BUS,STATE server;
+    class BIMP,STRIPE,GMAIL,WA ext;

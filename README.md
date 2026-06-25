@@ -13,19 +13,26 @@ Single **Next.js 14** app (App Router). API routes are the BFF in-process → th
 ## Structure
 ```
 refund-concierge/
-├─ web/                  # dashboard UI — talk panel · reasoning trail · status board · wow metric   (owner: build agent A)
+├─ app/                  # Next.js App Router root  (this IS "web/" — agent A's UI lives here)        (owner: build agent A)
+│  ├─ layout.tsx · page.tsx · globals.css            # dashboard shell (boots on stubbed seed)
+│  ├─ components/ · hooks/useEventStream.ts          # TalkPanel · ReasoningTrail · StatusBoard · WowMetric (agent A adds)
+│  └─ api/                                            # route handlers — the BFF                          (owner: build agent B)
+│     └─ events/route.ts # SSE hub (heartbeat every 15s) — DONE; B adds session/start, bimpe/webhook, admin/reset, health
 ├─ server/
-│  ├─ bff/               # API routes: BimpeAI client, session token, webhook→bus→SSE              (owner: build agent B)
-│  ├─ orchestrator/      # on refund.issued → email (Gmail) + WhatsApp fan-out, status events       (owner: build agent C)
-│  └─ config.ts          # FROZEN — feature flags + mode auto-detection
+│  ├─ bff/bus.ts         # in-process event bus (singleton) — DONE                                       (owner: build agent B)
+│  ├─ bff/bimpe.ts       # BimpeAI WEBCHAT client: sendMessage/getTranscript (+ canned stub, no key)    (owner: build agent B)
+│  ├─ orchestrator/index.ts  # onRefundIssued(ctx) email+WhatsApp fan-out (stub lights green E2E)        (owner: build agent C)
+│  └─ config.ts          # FROZEN — feature flags + mode auto-detection (server-only; reads secrets)
 ├─ shared/
-│  ├─ types.ts           # FROZEN — shared types
-│  └─ events.ts          # FROZEN — event names + payload shapes
-├─ seed.json             # FROZEN — the one seeded demo customer + order
+│  ├─ types.ts           # FROZEN — shared types (Refund, Customer, Order, StatusEvent, modes…)
+│  └─ events.ts          # FROZEN — event names + payload shapes + SSE envelope + bus contract
+├─ seed.json             # FROZEN — the one seeded demo customer + order (Ada / order 1024 / navy linen dress £42.99)
 ├─ public/               # static assets + fallback demo video
 └─ docs/
    └─ ARCHITECTURE.md    # the full build-ready architecture spec
 ```
+
+> Path note: `web/` in the build plan maps to **`app/`** (Next.js App Router requires the `app/` directory). Agent A owns `app/` UI + components + hooks; Agent B owns `app/api/*` + `server/bff/`; Agent C owns `server/orchestrator/`. Import contracts via `@shared/*`, `@server/*`, `@/seed.json`.
 
 ## Rules (so parallel work doesn't collide)
 1. **Freeze first:** `shared/types.ts`, `shared/events.ts`, `server/config.ts`, `seed.json` are the contract. Agree changes before editing; everyone imports from `shared/`, nobody redefines.

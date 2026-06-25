@@ -1,0 +1,53 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "fontFamily": "Inter, Helvetica, Arial, sans-serif",
+    "fontSize": "17px",
+    "actorBkg": "#13294a",
+    "actorBorder": "#3b7bff",
+    "actorTextColor": "#eaf1ff",
+    "actorLineColor": "#7c8db5",
+    "signalColor": "#cdd8ef",
+    "signalTextColor": "#1b2740",
+    "labelBoxBkg": "#102a22",
+    "labelBoxBorderColor": "#23c08a",
+    "labelTextColor": "#e6fff5",
+    "noteBkgColor": "#fff4cc",
+    "noteBorderColor": "#e0a800",
+    "noteTextColor": "#3a2e00"
+  }
+}}%%
+sequenceDiagram
+    autonumber
+    actor U as Customer (voice)
+    participant B as BimpeAI Agent
+    participant F as BFF (holds key)
+    participant S as Stripe TEST
+    participant O as Confirmation<br/>Orchestrator
+    participant G as Gmail MCP
+    participant W as WhatsApp
+    participant D as Dashboard
+
+    Note over U,D: t0 armed on first utterance
+    U->>B: "This jacket doesn't fit, refund order 1024"
+    B->>B: Reason over seeded KB<br/>(Ada · order #1024 · £42)
+    B-->>F: webhook: agent.reasoning / tool.called
+    F-->>D: SSE → reasoning trail fills
+
+    B->>S: issue_refund (£42)
+    S-->>B: refund object (re_...)
+    B-->>F: webhook: refund.issued
+    F-->>D: SSE refund.confirmed → Refund card GREEN
+
+    F->>O: runConfirmations(ctx)
+    par Parallel fan-out
+        O->>G: send confirmation email
+        G-->>O: email.sent
+        O-->>D: SSE → Email card GREEN
+    and
+        O->>W: send WhatsApp (via BimpeAI)
+        W-->>O: whatsapp.sent
+        O-->>D: SSE → WhatsApp card GREEN
+    end
+
+    Note over D: STOP timer →<br/>"Refunded + confirmed in ~40s"

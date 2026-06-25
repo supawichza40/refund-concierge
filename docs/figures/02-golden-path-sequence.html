@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/>
+<title>Golden-Path Sequence — Refund in ~40s</title>
+<style>
+  html,body{margin:0;background:#0a1424;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;}
+  .head{color:#eaf1ff;padding:26px 36px 6px;}
+  .head h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-0.3px;}
+  .head p{margin:4px 0 0;color:#9fb1d4;font-size:15px;}
+  .stage{padding:14px 36px 40px;}
+  .mermaid{background:#0a1424;}
+  .tip{color:#5d6f93;font-size:12px;padding:0 36px 26px;}
+</style>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad:true, securityLevel:"loose", maxTextSize:90000 });
+</script>
+</head>
+<body>
+  <div class="head"><h1>Golden-Path Sequence — Refund in ~40s</h1>
+  <p>Refund Concierge · mirrors docs/ARCHITECTURE.md · BIMPEAI_API_KEY lives only in the BFF</p></div>
+  <div class="stage" style="max-width:1180px;margin:0 auto;">
+    <pre class="mermaid">
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "fontFamily": "Inter, Helvetica, Arial, sans-serif",
+    "fontSize": "17px",
+    "actorBkg": "#13294a",
+    "actorBorder": "#3b7bff",
+    "actorTextColor": "#eaf1ff",
+    "actorLineColor": "#7c8db5",
+    "signalColor": "#cdd8ef",
+    "signalTextColor": "#1b2740",
+    "labelBoxBkg": "#102a22",
+    "labelBoxBorderColor": "#23c08a",
+    "labelTextColor": "#e6fff5",
+    "noteBkgColor": "#fff4cc",
+    "noteBorderColor": "#e0a800",
+    "noteTextColor": "#3a2e00"
+  }
+}}%%
+sequenceDiagram
+    autonumber
+    actor U as Customer (voice)
+    participant B as BimpeAI Agent
+    participant F as BFF (holds key)
+    participant S as Stripe TEST
+    participant O as Confirmation<br/>Orchestrator
+    participant G as Gmail MCP
+    participant W as WhatsApp
+    participant D as Dashboard
+
+    Note over U,D: t0 armed on first utterance
+    U->>B: "This jacket doesn't fit, refund order 1024"
+    B->>B: Reason over seeded KB<br/>(Ada · order #1024 · £42)
+    B-->>F: webhook: agent.reasoning / tool.called
+    F-->>D: SSE → reasoning trail fills
+
+    B->>S: issue_refund (£42)
+    S-->>B: refund object (re_...)
+    B-->>F: webhook: refund.issued
+    F-->>D: SSE refund.confirmed → Refund card GREEN
+
+    F->>O: runConfirmations(ctx)
+    par Parallel fan-out
+        O->>G: send confirmation email
+        G-->>O: email.sent
+        O-->>D: SSE → Email card GREEN
+    and
+        O->>W: send WhatsApp (via BimpeAI)
+        W-->>O: whatsapp.sent
+        O-->>D: SSE → WhatsApp card GREEN
+    end
+
+    Note over D: STOP timer →<br/>"Refunded + confirmed in ~40s"
+    </pre>
+  </div>
+  <div class="tip">Editable source: 02-golden-path-sequence.mmd · open in a browser, screenshot for slides, or render with mmdc.</div>
+</body></html>

@@ -1,0 +1,17 @@
+{
+  "customer": {
+    "id": "cust_ada",
+    "name": "Ada Lovelace",
+    "email": "demo-customer@example.com",
+    "whatsapp": "+447700900123"
+  },
+  "order": {
+    "id": "1024",
+    "item": "navy linen dress",
+    "amount": 42.99,
+    "currency": "GBP",
+    "issue": "charged twice / duplicate charge",
+    "etaDays": 5
+  },
+  "refundPolicy": "Refund policy (Marketplace Support): Customers charged more than once for a single order are entitled to a full refund of the duplicate charge. To resolve a duplicate-charge dispute: (1) confirm the order id and the customer's identity against the order record, (2) verify the order shows a duplicate charge for the same item and amount, (3) issue a refund for the duplicated amount to the original payment method. Refunds settle to the customer's card within the quoted ETA. Always confirm the order id, item, and refund amount back to the customer before issuing, and tell them a confirmation will arrive by email and WhatsApp."
+}

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/>
+<title>System Architecture</title>
+<style>
+  html,body{margin:0;background:#0a1424;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;}
+  .head{color:#eaf1ff;padding:26px 36px 6px;}
+  .head h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-0.3px;}
+  .head p{margin:4px 0 0;color:#9fb1d4;font-size:15px;}
+  .stage{padding:14px 36px 40px;}
+  .mermaid{background:#0a1424;}
+  .tip{color:#5d6f93;font-size:12px;padding:0 36px 26px;}
+</style>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad:true, securityLevel:"loose", maxTextSize:90000 });
+</script>
+</head>
+<body>
+  <div class="head"><h1>System Architecture</h1>
+  <p>Refund Concierge · mirrors docs/ARCHITECTURE.md · BIMPEAI_API_KEY lives only in the BFF</p></div>
+  <div class="stage" style="max-width:1280px;margin:0 auto;">
+    <pre class="mermaid">
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "fontFamily": "Inter, Helvetica, Arial, sans-serif",
+    "fontSize": "18px",
+    "primaryColor": "#10243e",
+    "primaryTextColor": "#e8eef7",
+    "primaryBorderColor": "#2f6df0",
+    "lineColor": "#7c8db5",
+    "clusterBkg": "#0c1830",
+    "clusterBorder": "#2a3a5c"
+  },
+  "flowchart": { "curve": "basis", "nodeSpacing": 55, "rankSpacing": 70 }
+}}%%
+flowchart TB
+    subgraph Browser["BROWSER &nbsp;&middot;&nbsp; NO SECRETS"]
+        DASH["<b>Demo Dashboard</b><br/>Talk panel &middot; Reasoning trail<br/>Status board &middot; Wow-metric timer"]
+        VOICE["<b>BimpeAI Web Voice widget</b><br/>embedded SDK / iframe"]
+    end
+
+    subgraph Server["BACKEND BFF &nbsp;&middot;&nbsp; Next.js / Node &nbsp;&#128274; holds BIMPEAI_API_KEY"]
+        BFF["<b>API Routes /api/*</b>"]
+        ORCH["<b>Confirmation Orchestrator</b><br/>in-process &middot; parallel fan-out"]
+        BUS["<b>Event Bus + SSE hub</b><br/>in-memory"]
+        STATE["<b>Demo State Store</b><br/>in-memory + seed.json"]
+    end
+
+    subgraph External["EXTERNAL SERVICES"]
+        BIMP["<b>BimpeAI API</b><br/>agent &middot; refund tool &middot; WhatsApp"]
+        STRIPE["<b>Stripe TEST mode</b><br/>refund object"]
+        GMAIL["<b>Gmail</b> (Claude Gmail MCP)<br/>real email send"]
+        WA["<b>WhatsApp</b> via BimpeAI<br/>phone-number-based"]
+    end
+
+    DASH <==>|"SSE /api/events"| BUS
+    DASH -->|"POST /api/session/start"| BFF
+    VOICE <==>|"voice stream &middot; session token"| BIMP
+    BFF ==>|"server-side, KEY attached"| BIMP
+    BIMP -.->|"webhook POST /api/bimpe/webhook<br/>refund.issued &middot; tool.called"| BFF
+    BIMP --> STRIPE
+    BFF --> ORCH
+    ORCH ==>|"send email"| GMAIL
+    ORCH ==>|"send WhatsApp"| BIMP
+    BIMP --> WA
+    ORCH --> BUS
+    BFF --> BUS
+    STATE -.seed.-> ORCH
+
+    classDef browser fill:#13294a,stroke:#3b7bff,stroke-width:2px,color:#eaf1ff;
+    classDef server fill:#102a22,stroke:#23c08a,stroke-width:2px,color:#e6fff5;
+    classDef ext fill:#241a33,stroke:#a571f0,stroke-width:2px,color:#f1e9ff;
+    class DASH,VOICE browser;
+    class BFF,ORCH,BUS,STATE server;
+    class BIMP,STRIPE,GMAIL,WA ext;
+    </pre>
+  </div>
+  <div class="tip">Editable source: 01-architecture.mmd · open in a browser, screenshot for slides, or render with mmdc.</div>
+</body></html>
