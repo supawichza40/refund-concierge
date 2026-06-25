@@ -52,6 +52,16 @@ export interface AppConfig {
   readonly voiceEnabled: boolean;
   /** Show the "Play recorded run" fallback-video button. */
   readonly fallbackVideo: boolean;
+  /**
+   * Demo-engineer ADDITION (documented, additive — does not alter the frozen
+   * flag shape A/B/C build against). When 'replay', the deterministic on-stage
+   * fallback is ARMED: POST /api/demo/replay emits the canned golden-path event
+   * sequence on a timer WITHOUT any live BimpeAI/Stripe/Gmail/WhatsApp call, so a
+   * venue-wifi or API failure cannot kill the live run. 'off' (default) leaves
+   * the live path untouched. The replay route refuses to run unless this is
+   * 'replay', so it can never fire by accident during a real run.
+   */
+  readonly demoMode: 'off' | 'replay';
 }
 
 // ---------------------------------------------------------------------------
@@ -100,6 +110,14 @@ function resolveStripeMode(): RefundMode {
   return envStr('STRIPE_SECRET_KEY') ? 'stripe' : 'simulated';
 }
 
+/**
+ * Resolve DEMO_MODE. Only the explicit value 'replay' arms the deterministic
+ * on-stage fallback; anything else (incl. unset) leaves the live path untouched.
+ */
+function resolveDemoMode(): AppConfig['demoMode'] {
+  return envStr('DEMO_MODE')?.toLowerCase() === 'replay' ? 'replay' : 'off';
+}
+
 // ---------------------------------------------------------------------------
 // Build (memoized) — read env once at module load.
 // ---------------------------------------------------------------------------
@@ -113,7 +131,7 @@ function buildConfig(): AppConfig {
     stripeSecretKey,
 
     bimpeBaseUrl: envStr('BIMPEAI_BASE_URL') ?? 'https://api.bimpe.ai/api/v1',
-    bimpeAgentId: envStr('BIMPEAI_AGENT_ID'),
+    bimpeAgentId: envStr('BIMPE_AGENT_ID') ?? envStr('BIMPEAI_AGENT_ID'),
 
     demoCustomerEmail: envStr('DEMO_CUSTOMER_EMAIL'),
     demoCustomerWhatsApp: envStr('DEMO_CUSTOMER_WHATSAPP'),
@@ -124,6 +142,7 @@ function buildConfig(): AppConfig {
     whatsappMode: resolveWhatsAppMode(),
     voiceEnabled: envBool('VOICE_ENABLED') ?? false,
     fallbackVideo: envBool('FALLBACK_VIDEO') ?? false,
+    demoMode: resolveDemoMode(),
   };
 }
 

@@ -64,8 +64,8 @@
 | # | Timing | Slide | Spoken Words | Delivery Notes |
 |---|--------|-------|--------------|----------------|
 | 10 | 0:45 | 6 | We hit Start — and the timer arms. | [Click or gesture to start. Let the timer visibly begin.] |
-| 11 | 0:50 | 6 | Our customer is Ada. She types: "I want a refund for order 1024 — this jacket doesn't fit." | [Read it naturally, as if Ada is real. POINT AT SCREEN — the chat input.] |
-| 12 | 1:00 | 6 | Watch the reasoning panel on the right. The agent recognises Ada, pulls order 1024 — forty-two dollars — and checks the return window. You can see every tool call, live. | [POINT AT SCREEN — reasoning/tool-call trail. PAUSE 2s while it runs.] |
+| 11 | 0:50 | 6 | Our customer is Ada. She types: "I want a refund for order 1024 — the navy linen dress, I was charged twice." | [Read it naturally, as if Ada is real. POINT AT SCREEN — the chat input.] |
+| 12 | 1:00 | 6 | Watch the reasoning panel on the right. The agent recognises Ada, pulls order 1024 — forty-two ninety-nine — and verifies the duplicate charge against policy. You can see every tool call, live. | [POINT AT SCREEN — reasoning/tool-call trail. PAUSE 2s while it runs.] |
 | 13 | 1:15 | 6 | Now — it doesn't send a ticket to a human. It calls Stripe. | [Slight emphasis on "calls Stripe." PAUSE while the Stripe call fires.] |
 | 14 | 1:22 | 6 | Refund issued. | [POINT AT SCREEN — status board. Let it breathe one beat.] |
 | 15 | 1:26 | 6 | Email sent. | [POINT AT SCREEN — Email ✅ lights up.] |

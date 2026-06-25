@@ -36,6 +36,23 @@ export interface BimpeClient {
   getTranscript(agentId: string, conversationId: string): Promise<ConversationMessage[]>;
 }
 
+/** Per-request network timeout for BimpeAI calls (demo-safe; never hang the UI). */
+const BIMPE_TIMEOUT_MS = 20_000;
+
+/**
+ * Resolve which BimpeAI agent to talk to.
+ *
+ * HARD GUARDRAIL: this MUST be OUR "Refund Concierge — demo" agent only. The
+ * canonical source is the BIMPE_AGENT_ID env var (set in .env.local). We keep a
+ * fallback to config.bimpeAgentId (which reads BIMPEAI_AGENT_ID) so either env
+ * spelling works, but BIMPE_AGENT_ID wins. Never reference any other agent.
+ */
+export function resolveAgentId(): string | undefined {
+  const fromEnv = process.env.BIMPE_AGENT_ID?.trim();
+  if (fromEnv) return fromEnv;
+  return config.bimpeAgentId;
+}
+
 // ---------------------------------------------------------------------------
 // Canned-reply stub (used when no BIMPEAI_API_KEY is present)
 // ---------------------------------------------------------------------------
@@ -78,10 +95,24 @@ function authHeaders(): HeadersInit {
   };
 }
 
+/** fetch with an AbortController timeout so a stalled call can't hang the demo. */
+async function fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), BIMPE_TIMEOUT_MS);
+  try {
+    return await fetch(url, { ...init, signal: ctrl.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 const liveClient: BimpeClient = {
+  // VERIFIED against the real API (201): the outer `message` is a status string
+  // ("Message sent successfully"); the assistant reply is at data.message and the
+  // conversation id at data.conversation_id.
   async sendMessage(agentId, userId, text) {
     const url = `${config.bimpeBaseUrl}/console/agents/${agentId}/conversations/messages`;
-    const res = await fetch(url, {
+    const res = await fetchWithTimeout(url, {
       method: 'POST',
       headers: authHeaders(),
       body: JSON.stringify({
@@ -92,22 +123,29 @@ const liveClient: BimpeClient = {
       }),
     });
     if (!res.ok) {
-      throw new Error(`BimpeAI sendMessage failed: ${res.status} ${res.statusText}`);
+      let detail = '';
+      try {
+        detail = (await res.text()).slice(0, 300);
+      } catch {
+        /* ignore */
+      }
+      throw new Error(`BimpeAI sendMessage failed: ${res.status} ${res.statusText} ${detail}`.trim());
     }
     const json = (await res.json()) as {
-      data?: { message?: string; conversation_id?: string; conversationId?: string };
+      message?: string;
+      data?: { message?: string; content?: string; conversation_id?: string; conversationId?: string };
     };
     const data = json.data ?? {};
     return {
       conversationId: data.conversation_id ?? data.conversationId ?? `conv_${Date.now()}`,
-      reply: data.message ?? '',
+      reply: data.message ?? data.content ?? '',
       raw: json,
     };
   },
 
   async getTranscript(agentId, conversationId) {
     const url = `${config.bimpeBaseUrl}/console/agents/${agentId}/conversations/${conversationId}/messages`;
-    const res = await fetch(url, { method: 'GET', headers: authHeaders() });
+    const res = await fetchWithTimeout(url, { method: 'GET', headers: authHeaders() });
     if (!res.ok) {
       throw new Error(`BimpeAI getTranscript failed: ${res.status} ${res.statusText}`);
     }
@@ -127,11 +165,15 @@ const liveClient: BimpeClient = {
 /** The active client: live if a key is configured, otherwise the canned stub. */
 export const bimpe: BimpeClient = hasBimpeKey ? liveClient : stubClient;
 
-/** Convenience wrappers so callers don't have to thread the singleton. */
-export function sendMessage(agentId: string, userId: string, text: string): Promise<SendMessageResult> {
-  return bimpe.sendMessage(agentId, userId, text);
+/**
+ * Convenience wrappers so callers don't have to thread the singleton or the
+ * agent id. The agentId arg is optional and defaults to OUR resolved demo agent
+ * (BIMPE_AGENT_ID). The stub ignores agentId entirely, so it stays demo-safe.
+ */
+export function sendMessage(text: string, userId: string, agentId?: string): Promise<SendMessageResult> {
+  return bimpe.sendMessage(agentId ?? resolveAgentId() ?? 'stub-agent', userId, text);
 }
 
-export function getTranscript(agentId: string, conversationId: string): Promise<ConversationMessage[]> {
-  return bimpe.getTranscript(agentId, conversationId);
+export function getTranscript(conversationId: string, agentId?: string): Promise<ConversationMessage[]> {
+  return bimpe.getTranscript(agentId ?? resolveAgentId() ?? 'stub-agent', conversationId);
 }

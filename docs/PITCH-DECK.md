@@ -212,7 +212,7 @@ One conversation. Zero tickets. Zero humans.
 
 <br>
 
-<div class="step">🔍 <strong>Recognize</strong> — Ada + order #1024 ($42.00)</div>
+<div class="step">🔍 <strong>Recognize</strong> — Ada + order #1024 (£42.99, charged twice)</div>
 <div class="step">💳 <strong>Refund</strong> — real Stripe TEST refund (or clearly-labeled simulated re_sim_*)</div>
 <div class="step">📧 <strong>Email</strong> — confirmation fires via Gmail ✅</div>
 <div class="step">📱 <strong>WhatsApp</strong> — second confirmation channel ✅</div>
