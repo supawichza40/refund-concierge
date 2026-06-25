@@ -39,13 +39,16 @@ import type { RefundContext, RefundMode } from '@shared/types';
  * decides; until then the demo uses the explicit POST /api/refund path.
  */
 const REFUND_MARKER = /\[\[ISSUE_REFUND\]\]/i;
-const REFUND_PHRASE =
-  /\b(issue|issuing|process(?:ing)?|approve|approved)\b[^.]*\brefund\b/i;
 
-/** True if an agent reply indicates the refund decision was reached. */
+/**
+ * True iff the agent emitted the explicit [[ISSUE_REFUND]] token.
+ * Token-only by design: the old phrase fallback was unsafe — it false-fired on
+ * anti-abuse refusals ("I can't issue a refund like that") and missed "issued".
+ * Agent system prompt v2 emits the token reliably (verified 3/3).
+ */
 export function replyTriggersRefund(reply: string): boolean {
   if (!reply) return false;
-  return REFUND_MARKER.test(reply) || REFUND_PHRASE.test(reply);
+  return REFUND_MARKER.test(reply);
 }
 
 /** Strip the internal marker so it never shows in the UI transcript. */
