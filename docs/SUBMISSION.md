@@ -6,6 +6,7 @@
 **Event:** London Agentic AI Hack Night · 25 June 2026
 **Track:** Agentic AI · Built on **BimpeAI**
 **One-liner:** The refund agent that doesn't file a ticket — it moves the money and proves it, on two channels, unsupervised.
+**Repo:** https://github.com/supawichza40/refund-concierge
 
 ---
 
